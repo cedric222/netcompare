@@ -1,0 +1,10 @@
+cisco:
+  no_command: "no"
+  dont_compare:
+    - "ntp clock-period"
+    - "Current Configuration ..."
+huawei:
+  no_command: "undo"
+  dont_compare:
+    - "test"
+    - "test2"

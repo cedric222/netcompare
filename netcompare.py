@@ -18,6 +18,7 @@ from ciscoconfparse import CiscoConfParse
 import sys
 import re
 import os
+import yaml
 
 
 def cli_parser():
@@ -28,18 +29,18 @@ def cli_parser():
                         type=str, help='Origin configuration file')
     parser.add_argument('target', metavar='target',
                         type=str, help='Target configuration file')
-    parser.add_argument('no_command', metavar='no_command',
-                        type=str, help='Negation command keyword')
+    parser.add_argument('vendor', metavar='vendor',
+                        type=str, help='vendor')
     return parser.parse_args()
 
 
-def clean_file(file, no_command):
+def clean_file(file, vendor):
     with open(file) as file_opened:
         list = file_opened.readlines()
 
     list_clean = []
 
-    if no_command == 'undo':
+    if vendor == 'undo':
         line_parent_sharp = False
         for line in list:
             line_clean = line.rstrip(' \t\r\n\0')
@@ -195,11 +196,13 @@ def netcompare(origin, target, no_command):
 
 def main():
     args = cli_parser()
+    with open('netcompare.yml', 'r') as f:
+        config = yaml.load(f)
 
-    origin_list = clean_file(args.origin, args.no_command)
-    target_list = clean_file(args.target, args.no_command)
+    origin_list = clean_file(args.origin, args.vendor)
+    target_list = clean_file(args.target, args.vendor)
 
-    display_commands = netcompare(origin_list, target_list, args.no_command)
+    display_commands = netcompare(origin_list, target_list, config[args.vendor]["no_command"])
     for line in display_commands:
         print line
 
